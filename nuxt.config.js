@@ -12,24 +12,40 @@ module.exports = {
       { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: 'http://www.lilei.site/favicon.ico' }
     ]
   },
   /*
   ** Customize the progress-bar color
   */
-  loading: { color: '#fff' },
+  loading: { color: '#3B8070',height: '5px' },
   /*
   ** Global CSS
   */
   css: [
-    'element-ui/lib/theme-chalk/index.css'
+    'element-ui/lib/theme-chalk/index.css',
+    '~assets/css/main.css',
+    '~assets/css/Markdown.css',
+    'mavon-editor/dist/css/index.css'
   ],
+
+
+  loader:[
+    {
+        test:/\.less$/,
+        loaders:'style-loader!css-loader!less-loader'
+    }
+ ],
+
+
+
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/element-ui'
+    '@/plugins/element-ui',
+    '@/plugins/iview',
+    '@/plugins/mavon',
   ],
   /*
   ** Nuxt.js dev-modules
@@ -40,6 +56,7 @@ module.exports = {
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios',
   ],
   /*
   ** Build configuration
@@ -49,6 +66,14 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
+    babel:{
+        "plugins":[
+            ['component',{
+                "libraryName":"element-ui",
+                "styleLibraryName":"theme-chalk"
+            }]
+        ]
+    },
     extend (config, ctx) {
     }
   }

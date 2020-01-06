@@ -6,6 +6,7 @@
         <el-row type="flex" justify="center">
             <el-col :span="14" class="detail_title">
                 <div>{{title}}</div>
+                <span class="articleAuthor">作者：{{author}}</span>
                 <div class="time">发布时间：{{time}}&nbsp;&nbsp;&nbsp;&nbsp;分类：{{list === 'Front' ? '前端文章' : '后端文章'}}</div>
             </el-col>
         </el-row>
@@ -25,7 +26,7 @@
             </el-col>
         </el-row>
         <!-- 评论 -->
-        <el-row type="flex" justify="center">
+        <el-row type="flex" justify="center" v-if="commentConfig">
         <el-col :span="15" class="detail_content" style="margin-left:-63px;">
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="姓名" prop="username">
@@ -44,11 +45,30 @@
             </el-form>
         </el-col>
         </el-row>
+        <el-row type="flex" justify="center" v-else>
+        <el-col :span="15" class="detail_content" style="margin-left:-63px;">
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" disabled>
+            <el-form-item label="姓名" prop="username">
+                <el-input type="text" v-model="ruleForm.username" @change="usernameChange" autocomplete="off" placeholder="作者已关闭评论"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+                <el-input type="text" v-model="ruleForm.email" autocomplete="off" placeholder="作者已关闭评论"></el-input>
+            </el-form-item>
+            <el-form-item label="内容" prop="content">
+                <el-input type="textarea" :rows="8" v-model="ruleForm.content" autocomplete="off" placeholder="作者已关闭评论"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+                <el-button @click="resetForm('ruleForm')">重置</el-button>
+            </el-form-item>
+            </el-form>
+        </el-col>
+        </el-row>
        <el-row type="flex" justify="center" class="detail_content">
         <el-col :span="14">
             <el-card class="box-card" v-show="commentList.length !== 0" v-for="(item, index) in curcommentList" :key="index">
             <div slot="header" class="clearfix">
-                <span style="font-weight: bold;">{{item.username}} <el-tag type="success" v-show="author.includes(item.username)">作者</el-tag> 说：</span>
+                <span style="font-weight: bold;">{{item.username}} <el-tag type="success" v-show="author == item.username">作者</el-tag> 说：</span>
                 <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>-->
                 <span style="float: right; padding: 3px 0;font-weight: bold;"><Time :time="item.time" :interval="1" /></span>
             </div>
@@ -116,15 +136,24 @@ export default {
             },
             commentList: [],
             count: 0,
-            author: [],
+            author: '',
             page:1,
-            pagesize:5
+            pagesize:5,
+            commentConfig:'true'
         }
     },
     created() {
         this.commentLists(this.$route.query.id)
+        this.getCommentConfig();
     },
     methods: {
+        getCommentConfig() {
+            let json = {author:this.author}
+		    this.$axios.get('/comment/getConfig',{params:json}).then(res => {
+                this.commentConfig = res.data.data[0].status;
+            });
+            // console.log(result)
+        },
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
@@ -170,11 +199,11 @@ export default {
             try {
                 // console.log(id)
                 let {data: {count, result}} = await this.$axios.post('/comment/articleComments', {id});
-                let {data: {data}} = await this.$axios.post('/comment/configList', {id})
+                // let {data: {data}} = await this.$axios.post('/comment/configList', {id})
                 /*数组暂时倒序*/
                 this.count = count
                 this.commentList = result.comment.reverse()
-                this.author = data.author
+                // this.author = data.author
             } catch (error) {
                 // handle error
             }
@@ -193,15 +222,16 @@ export default {
         let json = {id:ctx.query.id}
 		let result = await ctx.$axios.get('/article/articleInfo',{params:json});
         let {info} = result.data;
-        let {content,des,list,time,title} = info[0];
+        let {content,des,list,time,title,author} = info[0];
         if(result.status === 200 && result.data.error === 0){
-		    return {title,des,content,list,time}
+		    return {title,des,content,list,time,author}
         } else{
             return{
                 title:'test',
                 time:'2019年10月-1',
                 list:'Front',
-                content:'<h1>暂无数据</h1>'
+                content:'<h1>暂无数据</h1>',
+                author:'admin'
             }
         }
     }
@@ -217,7 +247,7 @@ body,html {
 }
 .comment {
     .detail_title {
-        margin:2rem 0 3rem 0;
+        margin:2rem 0 2rem 0;
         font-size:31px;
         font-weight: bold;
         padding-bottom:1rem;
@@ -225,8 +255,12 @@ body,html {
         border-bottom:1px dashed @color;
         text-align: center;
         .time {
-            margin:1.5rem 0 0 0;
+            // margin:1rem 0 0 0;
             font-size:12px;
+            font-weight:normal;
+        }
+        .articleAuthor {
+            font-size:16px;
             font-weight:normal;
         }
     }

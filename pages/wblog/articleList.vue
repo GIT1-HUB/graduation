@@ -27,7 +27,7 @@
             <Table border stripe :loading="backloading" :columns="columns12" :data="back" no-data-text="没有数据">
                 <template slot-scope="{ row }" slot="title">
                     <div class="title">
-                        <i-button type="success">后端文章</i-button>
+                        <i-button type="warning">后端文章</i-button>
                         <span class="t">{{ row.title }}</span>
                     </div>
                 </template>

@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 import axios from './utils/axios'
 import frontArticle from '../dbs/model/frontArticleSchema'
+import comment from '../dbs/model/commentSchema'
 import backArticle from '../dbs/model/backArticleSchema'
 
 let router = new Router({
@@ -64,7 +65,7 @@ router.get('/frontList', async ctx => {
     let page = parseInt((req.page-1) * req.pagesize);
     let pagesize = parseInt(req.pagesize);
     let author = req.author;
-    console.log(author)
+    // console.log(author)
     let front = await frontArticle.find({author:author},{__v:0,content:0,original:0}).skip(page).limit(pagesize).sort({'_id':-1});
     let frontCount = await frontArticle.countDocuments({author:author});
     ctx.body = {
@@ -85,7 +86,7 @@ router.get('/backList', async ctx => {
     let page = parseInt((req.page-1) * req.pagesize);
     let pagesize = parseInt(req.pagesize);
     let author = req.author;
-    console.log(author)
+    // console.log(author)
     let back = await backArticle.find({author:author},{__v:0,content:0,original:0}).skip(page).limit(pagesize).sort({'_id':-1});
     let backCount = await backArticle.countDocuments({author:author});
     ctx.body = {
@@ -148,7 +149,8 @@ router.post('/delArticle',async ctx => {
 	  let {id,list} = req;
     let db = list == 'front' ? frontArticle : backArticle;
     // console.log(db)
-		let res = await db.remove({_id:id});
+    let res = await db.remove({_id:id});
+    let res2 = await comment.remove({id:id})
 		let {n,ok} = res;
 		ctx.body = {
 			del:n,

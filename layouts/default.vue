@@ -3,7 +3,20 @@
     <nuxt />
   </div>
 </template>
-
+<script>
+export default {
+  head() {
+		return {
+			title:'李磊的个人博客-一个基于Nuxt构建的博客网站',
+			meta:[
+				{hid:'description',name:'description',content:'李磊个人博客，关注于web前端技术和web全栈技术的学习研究。'},
+				{hid:'keywords',name:'keywords',content:'李磊,互联网,自媒体,李磊博客,新鲜科技,科技博客，个人博客,原创博客,前端,前端开发,全栈,全栈开发,nuxt,nuxtjs,vue,vuejs'},
+				{hid:'author',content:'lilei'}
+			]
+		}
+	}
+}
+</script>
 <style>
 html {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',

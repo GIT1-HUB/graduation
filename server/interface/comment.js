@@ -23,7 +23,7 @@ router.post('/insertComment', async ctx => {
         let {_id: id, title,author} = await article.findOne({
             "_id": request.id
         })
-        console.log(author)
+        // console.log(author)
         // delete request.comment.pass
         let json = Object.assign(request.comment, {
             ip: getUserIp(ctx.req)
@@ -84,7 +84,7 @@ router.post('/commentsList', async ctx => {
         let pageSize = parseInt(req.pagesize);
         let author = req.author;
 
-        console.log(author)
+        // console.log(author)
         // console.log(pageSize)
         let result = await comment.find({author:author}, {
             __v: 0,
@@ -105,9 +105,9 @@ router.post('/commentsList', async ctx => {
 router.get('/searchCommentList', async ctx =>{
     try {
         let searcharticle = ctx.request.query.searcharticle;
-        console.log(searcharticle);
+        // console.log(searcharticle);
         let strReg = eval('/' + searcharticle +'/');
-        console.log(strReg);
+        // console.log(strReg);
         let sclist = await comment.find({title:strReg});
         ctx.body ={
             error:0,
@@ -157,7 +157,7 @@ router.get('/searchCommentList', async ctx =>{
 //     }
 // })
 
-router.post('/articleComments',async (ctx) => {
+router.post('/articleComments',async ctx => {
     try {
         let request = ctx.request.body;
         let [result] = await comment.find({
@@ -176,12 +176,37 @@ router.post('/articleComments',async (ctx) => {
     }
 })
 
-router.post('/configList',async (ctx) => {
+router.get('/getConfig',async ctx => {
     try {
-        let [result] = await config.find({}, {
+        let request = ctx.request.query;
+        let author = request.author;
+        let result = await config.find({author:author}, {
             _id: 0,
             __v: 0
         })
+        ctx.body = {
+            error: 0,
+            data: result
+        }
+    } catch ( error ) {
+        ctx.body = {
+            error: 1,
+            data: error
+        }
+    }
+})
+
+router.get('/setConfig',async ctx => {
+    try {
+        let req = ctx.request.query;
+        let author = req.author;
+        let status = req.status;
+        // console.log(ctx.req.body)
+        // console.log(author)
+        // console.log(status)
+        let result = await config.updateOne({author:author}, {
+           status:status
+        },{upsert:true})
         ctx.body = {
             error: 0,
             data: result
@@ -207,6 +232,16 @@ router.post('/delComment',async ctx => {
                 }
             }
         })
+        let check = await comment.findOne({'id':request.id});
+        if (check.comment.length == 0) {
+            await comment.remove({id:request.id},function(err,res){
+                if (err) {
+                    console.log('服务器出错')
+                } else {
+                    console.log('perfect')
+                }
+            })
+        }
         ctx.body = {
             error: 0,
             delCount: result.nModified,

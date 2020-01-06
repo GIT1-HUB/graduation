@@ -25,6 +25,9 @@
               <span>
                 <i class="el-icon-view"></i>&nbsp;115次阅读
               </span>
+              <span>
+                <i class="el-icon-s-custom"></i>&nbsp;{{item.author}}
+              </span>
             </div>
             <div class="box-content">{{item.des}}</div>
           </el-card>
@@ -127,21 +130,25 @@ export default {
           _id: 123,
           title: "test",
           time: "2019年12月22日",
+          author:'admin',
           des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
           },{
             _id: 124,
             title: "test",
             time: "2019年12月22日",
+            author:'admin',
             des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
           },{
             _id: 126,
             title: "test",
             time: "2019年12月22日",
+            author:'admin',
             des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
           },{
             _id: 128,
             title: "test",
             time: "2019年12月22日",
+            author:'admin',
             des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
           },
         ]

@@ -37,9 +37,12 @@
             <span class="title1">{{item.title}}</span>
             <span calss="title2" style="float:right">{{item.id}}</span>
           </p>
-          <i-table border :columns="columns12" :data="item.comment" height="183">
+          <i-table border :columns="columns12" :data="item.comment" max-height="183">
             <template slot-scope="{ row }" slot="username">
-              <strong>{{ row.username }}</strong>
+              <div>
+                <strong>{{ row.username }}</strong>
+                <el-tag type="success" v-show="curusername == row.username">作者</el-tag>
+              </div>
             </template>
             <template slot-scope="{ row, index }" slot="action">
               <Button
@@ -128,10 +131,33 @@ export default {
   },
   created() {
     this.getCommentList();
+    this.getCommentConfig();
+  },
+  computed: {
+    curusername(){
+      return this.$store.state.username
+    }
   },
   methods: {
-    change(status) {
-      this.$Message.info("评论：" + status);
+    getCommentConfig() {
+        let json = {author:this.curusername}
+		    this.$axios.get('/comment/getConfig',{params:json}).then(res => {
+          this.switch1 = res.data.data[0].status;
+        });
+            // console.log(result)
+    },
+    async change(status) {
+      let json = {author:this.curusername,status:status};
+      let {data:{error}} = await this.$axios.get('/comment/setConfig',{params:json})
+      if(error == 0){
+        if(status == true){
+          this.$Message.info("评论开启");
+        } else {
+          this.$Message.info("评论关闭");
+        }
+      }
+
+      
     },
     async getCommentList() {
       let { data } = await this.$axios.post("/comment/commentsList", {
@@ -247,5 +273,9 @@ export default {
   text-align: center;
   display: block;
   font-size: 24px;
+}
+.el-tag--success {
+  width: 50px;
+  float: left;
 }
 </style>

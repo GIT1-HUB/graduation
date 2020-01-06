@@ -11,7 +11,7 @@
                     <div class="nav-right">
                         <MenuItem name="1">
                             <Icon type="ios-paper"></Icon>
-                            待定内容
+                            我的博客
                         </MenuItem>
                         <MenuItem name="2">
                             <Icon type="ios-people"></Icon>

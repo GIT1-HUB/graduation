@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 let configSchema = new mongoose.Schema({
-    author: [],
+    // author: [],
+    author:String,
     status: Boolean
 });
 

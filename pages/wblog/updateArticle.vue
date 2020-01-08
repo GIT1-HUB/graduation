@@ -24,7 +24,7 @@
           placeholder="开始编写文章内容(上传图片为七牛云，删除功能暂无)..."
           style="min-height:600px;"
         />
-        <Button type="success" class="article_button" @click="submitArticle">发布文章</Button>
+        <Button type="warning" class="article_button" @click="submitArticle">发布文章</Button>
       </Col>
       <Col span="4" offset="1" class="content_right">
         <Card class="card">

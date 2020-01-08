@@ -178,7 +178,8 @@ export default {
                 this.$notify({
                     title: '评论成功',
                     message: '发布评论成功，请注意言论',
-                    type: 'success'
+                    type: 'success',
+                    duration:2000
                 });
             this.commentLists(this.$route.query.id)
             }

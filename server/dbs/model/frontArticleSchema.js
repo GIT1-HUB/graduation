@@ -8,6 +8,7 @@ const articleSchema = new Schema({
 	des:String,
 	list:String,
 	author:String,
+	readnumber:String,
 	imgFileName: String,
 	comment: []
 })

@@ -102,19 +102,20 @@ export default {
         author: this.$store.state.username
       }
       if (Object.is(this.title, '')) {
-        this.error('文章标题留空无法保存', '请仔细检查文章标题', false)
+        this.$Notice.error({title:'文章标题留空无法保存', desc:'请仔细检查文章标题'})
       } else {
         this.$axios.post('/article/insertArticle', param).then(res => {
           let {error} = res.data
-          console.log(error)
+          // console.log(error)
           if (Object.is(error, 0)) {
             this.$Notice.success({
                     title: '文章发布成功',
-                    desc: '请注意言行，不要传播色情内容 '
+                    desc: '请注意言行，不要传播色情内容 ',
+                    duration:2
             });
             [this.title, this.des, this.original, this.content] = ['']
           } else {
-            this.error('发布失败', '未知原因', false)
+            this.$Notice.error({title:'发布失败', desc:'未知原因'})
             console.log(123344455)
           }
         })

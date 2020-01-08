@@ -6,7 +6,7 @@
                 <nav-left class="navleft"></nav-left>
             </Col>
             <Col span="21" class="routerView">
-                <nuxt />
+                <nuxt/>
             </Col>
             </Row>
     </div>

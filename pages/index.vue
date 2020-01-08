@@ -6,12 +6,14 @@
     <el-row type="flex" justify="center" class="content-blog">
       <el-col :span="10" class="content-col">
       <el-tabs class="articlemenu" v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="全部" name="All"></el-tab-pane>
         <el-tab-pane label="前端" name="Front"></el-tab-pane>
         <el-tab-pane label="后端" name="Back"></el-tab-pane>
-    </el-tabs>
+      </el-tabs>
         <nuxt-link
           v-for="item in list"
           :key="item._id"
+          @click.native="clickArticle(item._id)"
           :to="{path:'/article',query:{id:item._id}}"
           class="box-href"
         >
@@ -23,7 +25,8 @@
                 &nbsp;{{item.time}}
               </span>
               <span>
-                <i class="el-icon-view"></i>&nbsp;115次阅读
+                <i class="el-icon-view"></i>&nbsp;
+                115次阅读
               </span>
               <span>
                 <i class="el-icon-s-custom"></i>&nbsp;{{item.author}}
@@ -96,16 +99,21 @@ export default {
   data() {
     return {
       activeIndex: 'index',
-      activeName:'Front'
+      activeName:'All',
     };
   },
   components: {
     NavHeader
   },
+  mounted() {
+  },
   methods: {
+    clickArticle(id) {
+      console.log(id)
+    },
     pagination(page) {
 			let json = {page,pagesize:5}
-			this.$axios.get('/article/getFrontArticle',{params:json}).then(res=>{
+			this.$axios.get(`/article/get${this.activeName}Article`,{params:json}).then(res=>{
 				let {error,count,list} = res.data;
 				this.list =list;
 			});
@@ -119,55 +127,17 @@ export default {
       let json = {page:1,pagesize:5};
       let {status,data:{count,list}} = await this.$axios.get(`/article/get${articletype}Article`,{params:json});
       let lately = list.slice(0,4);
-    if(status === 200){
-      this.count = count;
-      this.list = list;
-      this.lately = lately;
-    } else {
-        this.count = 4;
-        this.list=[
-          {
-          _id: 123,
-          title: "test",
-          time: "2019年12月22日",
-          author:'admin',
-          des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-          },{
-            _id: 124,
-            title: "test",
-            time: "2019年12月22日",
-            author:'admin',
-            des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-          },{
-            _id: 126,
-            title: "test",
-            time: "2019年12月22日",
-            author:'admin',
-            des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-          },{
-            _id: 128,
-            title: "test",
-            time: "2019年12月22日",
-            author:'admin',
-            des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-          },
-        ]
-        this.lately=[{
-        _id:22,
-        title:'test'
-      },{
-        _id:23,
-        title:'test'
-      },{
-        _id:24,
-        title:'test'
-      }]
-      }
-    }
+      if(status === 200){
+        this.count = count;
+        this.list = list;
+        this.lately = lately;
+      } 
+    },
   },
   async asyncData(ctx) {
+    // if (!process.server) return
     let json = {page:1,pagesize:5};
-    let {status,data:{count,list}} = await ctx.$axios.get('/article/getFrontArticle',{params:json});
+    let {status,data:{count,list}} = await ctx.$axios.get('/article/getAllArticle',{params:json});
     let lately = list.slice(0,4);
     if(status === 200){
       return {
@@ -175,44 +145,8 @@ export default {
         list,
         lately
       }
-    } else {
-      return{
-        count:4,
-        list:[
-          {
-          _id: 123,
-          title: "test",
-          time: "2019年12月22日",
-          des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-        },{
-          _id: 124,
-          title: "test",
-          time: "2019年12月22日",
-          des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-        },{
-          _id: 126,
-          title: "test",
-          time: "2019年12月22日",
-          des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-        },{
-          _id: 128,
-          title: "test",
-          time: "2019年12月22日",
-          des: "sdfjhawsiuefhwasiuofhsaioufhasioefu"
-        },
-        ],
-        lately:[{
-        _id:22,
-        title:'test'
-      },{
-        _id:23,
-        title:'test'
-      },{
-        _id:24,
-        title:'test'
-      }]
-      }
     }
+    
   },
   head() {
 		return {
@@ -223,7 +157,10 @@ export default {
 				{hid:'author',content:'lilei'}
 			]
 		}
-	}
+	},
+  activated() {
+    this.page = 1
+  }
 };
 </script>
 
@@ -232,5 +169,10 @@ export default {
 
 .articlemenu {
   width: 400px;
+}
+.articleSearch {
+  position: absolute;
+  top: -10px;
+  left: 430px;
 }
 </style>

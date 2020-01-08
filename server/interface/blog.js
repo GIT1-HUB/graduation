@@ -8,6 +8,14 @@ let router = new Router({
   prefix: '/article'
 })
 
+// 排序方法
+function compare(property){
+  return function(a,b){
+      var value1 = a[property];
+      var value2 = b[property];
+      return value1 - value2;
+  }
+}
 
 router.post('/insertArticle',async ctx => {
   try{
@@ -143,6 +151,29 @@ router.get('/articleInfo', async ctx => {
   }
 })
 
+router.get('/getAllArticle', async ctx => {
+  try {
+    let req = ctx.request.query;
+    let pageStart = parseInt((req.page - 1) * req.pagesize);
+    let pageEnd = parseInt((req.page) * req.pagesize);
+    let result1 = await frontArticle.find({})
+    let result2 = await backArticle.find({})
+    let result = result1.concat(result2).sort(compare('_id'));
+    let list = result.slice(pageStart,pageEnd)
+    // let result3 = result
+    ctx.body = {
+      error: 0,
+      count:result.length,
+      list
+    }
+  } catch (e) {
+    ctx.body = {
+      error: 1,
+      info: e
+    }
+  }
+})
+
 router.post('/delArticle',async ctx => {
   try{
 		let req = ctx.request.body;
@@ -240,6 +271,57 @@ router.post('/update',async ctx => {
         error:-1,
         e
       };
+  }
+})
+
+
+router.get('/searchFrontArticleListByAuthor', async ctx =>{
+  try {
+      let searcharticle = ctx.request.query.searcharticle;
+      let author = ctx.request.query.author;
+      let strReg = eval('/' + searcharticle +'/');
+      let list = await frontArticle.find({author:author,$or:[{title:strReg},{original:strReg},{des:strReg}]});
+      ctx.body ={
+          error:0,
+          list,
+          count:list.length
+      }
+  } catch (error) {
+      ctx.body = error
+  }
+})
+router.get('/searchBackArticleListByAuthor', async ctx =>{
+  try {
+      let searcharticle = ctx.request.query.searcharticle;
+      let author = ctx.request.query.author;
+      let strReg = eval('/' + searcharticle +'/');
+      let list = await backArticle.find({author:author,$or:[{title:strReg},{original:strReg},{des:strReg}]});
+      ctx.body ={
+          error:0,
+          list,
+          count:list.length
+      }
+  } catch (error) {
+      ctx.body = error
+  }
+})
+
+
+
+router.get('/searchArticleList', async ctx =>{
+  try {
+      let searcharticle = ctx.request.query.searcharticle;
+      let strReg = eval('/' + searcharticle +'/');
+      let list1 = await frontArticle.find({$or:[{title:strReg},{original:strReg},{des:strReg}]});
+      let list2 = await backArticle.find({$or:[{title:strReg},{original:strReg},{des:strReg}]});
+      let list = list1.concat(list2)
+      ctx.body ={
+          error:0,
+          list,
+          count:list.length
+      }
+  } catch (error) {
+      ctx.body = error
   }
 })
 

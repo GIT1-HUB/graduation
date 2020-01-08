@@ -1,5 +1,11 @@
 <template>
     <div class="container">
+
+        <!-- 搜索框 -->
+        <Input search enter-button placeholder="输入关键词搜索文章。。。" class="searchArticle" v-model="searchStr" @on-search="searchArticle"/>
+
+
+        <!-- 前端文章 -->
         <Row type="flex" justify="space-between" class="frontlist">
         <Col :span="23" >
             <h2>前端文章：</h2>
@@ -21,6 +27,8 @@
         </Col>
         </Row>
 
+
+        <!-- 后端文章 -->
         <Row type="flex" justify="space-between" class="backlist">
         <Col :span="23" >
             <h2>后端文章：</h2>
@@ -64,6 +72,7 @@ export default {
     layout:'wblog',
     data() {
         return {
+            searchStr:'',
             backCount: 0,
             frontCount: 0,
             modal2: false,
@@ -87,7 +96,8 @@ export default {
                 },
                 {
                     title: '发布时间',
-                    key: 'time'
+                    key: 'time',
+                    sortable: true
                 },
                 {
                     title: 'Action',
@@ -177,6 +187,31 @@ export default {
                 this.initFront(1)
                 this.initBack(1)
             }, 1500)
+        },
+        searchArticle() {
+            this.frontloading = true;
+            this.backloading = true;
+            if(this.searchArticle == ''){
+                this.initFront(1)
+                this.initBack(1)
+            }
+            let json = {author:this.$store.state.username,searcharticle:this.searchStr};
+            this.$axios.get('/article/searchFrontArticleListByAuthor',{params:json}).then((res) => {
+                if(res.status == 200 && res.data.error == 0){
+                    this.front = res.data.list
+                    // console.log(front)
+                    // console.log(123)
+                    this.frontCount = res.data.count
+                    this.frontloading = false;
+                }
+            })
+            this.$axios.get('/article/searchBackArticleListByAuthor',{params:json}).then((res) => {
+                if(res.status == 200 && res.data.error == 0){
+                    this.back = res.data.list
+                    this.backCount = res.data.count
+                    this.backloading = false;
+                }
+            })
         }
     }
 
@@ -185,6 +220,10 @@ export default {
 <style lang="less" scope>
     .container {
         margin: 10px 50px;
+        .searchArticle {
+            width: 450px;
+            margin: 0 auto;
+        }
         span {
             font-size: 12px;
         }

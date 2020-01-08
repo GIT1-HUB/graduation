@@ -1,6 +1,11 @@
 <template>
   <div>
-    <nuxt />
+      <nuxt keep-alive/>
+
+      <BackTop :height="100" :bottom="50">
+        <div class="top">返回顶端</div>
+      </BackTop>
+
   </div>
 </template>
 <script>
@@ -65,4 +70,11 @@ html {
   color: #fff;
   background-color: #35495e;
 }
+.top{
+        padding: 10px;
+        background: rgba(0, 153, 229, .7);
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+    }
 </style>

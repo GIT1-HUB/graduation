@@ -8,7 +8,7 @@ let articleSchema = new mongoose.Schema({
 	des:String,
 	list:String,
 	author:String,
-	readnumber:String,
+	readnumber:{type:Number,default:0},
     banner: String,
     imgFileName: String
 });

@@ -1,20 +1,31 @@
 <template>
   <div>
-    <nav-header :activeIndex = 'activeIndex'></nav-header>
-    
+    <nav-header :activeIndex="activeIndex"></nav-header>
+
     <!-- 文章列表 -->
     <el-row type="flex" justify="center" class="content-blog">
       <el-col :span="10" class="content-col">
-      <el-tabs class="articlemenu" v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="全部" name="All"></el-tab-pane>
-        <el-tab-pane label="前端" name="Front"></el-tab-pane>
-        <el-tab-pane label="后端" name="Back"></el-tab-pane>
-      </el-tabs>
+          <el-tabs class="articlemenu" v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="全部" name="All"></el-tab-pane>
+            <el-tab-pane label="前端" name="Front"></el-tab-pane>
+            <el-tab-pane label="后端" name="Back"></el-tab-pane>
+          </el-tabs>
+        <Input
+          search
+          enter-button="Search"
+          placeholder="输入关键词搜索文章"
+          @on-search="serachButton"
+          v-model="searchInput"
+          class="searchInput"
+        />
+
+
         <nuxt-link
           v-for="item in list"
           :key="item._id"
-          @click.native="clickArticle(item._id)"
+          target="_blank"
           :to="{path:'/article',query:{id:item._id}}"
+          @click.native="clickArticle(item._id,item.readnumber)"
           class="box-href"
         >
           <el-card class="box-card" shadow="hover">
@@ -26,10 +37,11 @@
               </span>
               <span>
                 <i class="el-icon-view"></i>&nbsp;
-                115次阅读
+                {{item.readnumber}}次阅读
               </span>
               <span>
-                <i class="el-icon-s-custom"></i>&nbsp;{{item.author}}
+                <i class="el-icon-s-custom"></i>
+                &nbsp;{{item.author}}
               </span>
             </div>
             <div class="box-content">{{item.des}}</div>
@@ -98,68 +110,105 @@ export default {
   name: "index",
   data() {
     return {
-      activeIndex: 'index',
-      activeName:'All',
+      activeIndex: "index",
+      activeName: "All",
+      searchInput: ""
     };
   },
   components: {
     NavHeader
   },
   mounted() {
+    this.page = 1;
+    this.getArticle(this.activeName);
   },
   methods: {
-    clickArticle(id) {
-      console.log(id)
+    clickArticle(id,number) {
+      // console.log(id);
+      // console.log(number)
+      let json = {id:id,number:number+1}
+      this.$axios.get('/article/updateReadNumber', { params: json })
+    },
+    serachButton() {
+      // console.log(this.searchInput)
+      if(!this.searchInput){
+        // console.log(this.activeName)
+        this.getArticle(this.activeName);
+        return;
+      } else {
+      let json = {searcharticle:this.searchInput};
+      this.$axios
+        .get('/article/searchArticleList', { params: json })
+        .then(res => {
+          let { error, count, list } = res.data;
+          this.list = list;
+          this.count = count
+        });
+      }
     },
     pagination(page) {
-			let json = {page,pagesize:5}
-			this.$axios.get(`/article/get${this.activeName}Article`,{params:json}).then(res=>{
-				let {error,count,list} = res.data;
-				this.list =list;
-			});
-		},
+      let json = { page, pagesize: 5 };
+      this.$axios
+        .get(`/article/get${this.activeName}Article`, { params: json })
+        .then(res => {
+          let { error, count, list } = res.data;
+          this.list = list;
+        });
+    },
     handleClick(tab, event) {
-        console.log(tab.name);
-        this.getArticle(tab.name)
-        
+      console.log(tab.name);
+      this.getArticle(tab.name);
     },
     async getArticle(articletype) {
-      let json = {page:1,pagesize:5};
-      let {status,data:{count,list}} = await this.$axios.get(`/article/get${articletype}Article`,{params:json});
-      let lately = list.slice(0,4);
-      if(status === 200){
+      let json = { page: 1, pagesize: 5 };
+      let {
+        status,
+        data: { count, list }
+      } = await this.$axios.get(`/article/get${articletype}Article`, {
+        params: json
+      });
+      let lately = list.slice(0, 4);
+      if (status === 200) {
         this.count = count;
         this.list = list;
         this.lately = lately;
-      } 
-    },
+      }
+    }
   },
   async asyncData(ctx) {
     // if (!process.server) return
-    let json = {page:1,pagesize:5};
-    let {status,data:{count,list}} = await ctx.$axios.get('/article/getAllArticle',{params:json});
-    let lately = list.slice(0,4);
-    if(status === 200){
+    let json = { page: 1, pagesize: 5 };
+    let {
+      status,
+      data: { count, list }
+    } = await ctx.$axios.get("/article/getAllArticle", { params: json });
+    let lately = list.slice(0, 4);
+    if (status === 200) {
       return {
         count,
         list,
         lately
-      }
+      };
     }
-    
   },
   head() {
-		return {
-			title:'李磊的个人博客-一个基于Nuxt构建的博客网站',
-			meta:[
-				{hid:'description',name:'description',content:'李磊个人博客，关注于web前端技术和web全栈技术的学习研究。'},
-				{hid:'keywords',name:'keywords',content:'李磊,互联网,自媒体,李磊博客,新鲜科技,科技博客，个人博客,原创博客,前端,前端开发,全栈,全栈开发,nuxt,nuxtjs,vue,vuejs'},
-				{hid:'author',content:'lilei'}
-			]
-		}
-	},
-  activated() {
-    this.page = 1
+    return {
+      title: "李磊的个人博客-一个基于Nuxt构建的博客网站",
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: "李磊个人博客，关注于web前端技术和web全栈技术的学习研究。"
+        },
+        {
+          hid: "keywords",
+          name: "keywords",
+          content:
+            "李磊,互联网,自媒体,李磊博客,新鲜科技,科技博客，个人博客,原创博客,前端,前端开发,全栈,全栈开发,nuxt,nuxtjs,vue,vuejs"
+        },
+        { hid: "author", content: "lilei" }
+      ]
+    };
   }
 };
 </script>
@@ -174,5 +223,8 @@ export default {
   position: absolute;
   top: -10px;
   left: 430px;
+}
+.searchInput {
+  margin-bottom: 20px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-      <nuxt keep-alive/>
+      <nuxt/>
 
       <BackTop :height="100" :bottom="50">
         <div class="top">返回顶端</div>

@@ -24,9 +24,9 @@ router.post('/insertArticle',async ctx => {
     let {title,htmlContent,date,des,original,radio,author} = req;
     // let db = radio = 'Front' ? 'frontArticle' : 'backArticle';
     if(radio == 'Front') {
-      var result = await frontArticle.create({title,content:htmlContent,time:date,des,original,list:radio,author})
+      var result = await frontArticle.create({title,content:htmlContent,time:date,des,original,list:radio,author,readnumber:0})
     } else {
-      var result = await backArticle.create({title,content:htmlContent,time:date,des,original,list:radio,author})
+      var result = await backArticle.create({title,content:htmlContent,time:date,des,original,list:radio,author,readnumber:0})
     }
     // console.log(db)
     // const front = await db.update({title},{$set:{title,content:htmlContent,time:date,des,original,list:radio}},{upsert:true});
@@ -323,6 +323,52 @@ router.get('/searchArticleList', async ctx =>{
   } catch (error) {
       ctx.body = error
   }
+})
+
+router.get('/updateReadNumber',async ctx => {
+  try {
+    let req = ctx.request.query;
+    let id = req.id;
+    let number = req.number;
+    let front = await frontArticle.findByIdAndUpdate({
+      _id: id
+    }, {
+        $set: {
+          readnumber:number
+        }
+    },function(err, res){
+      if (err) {
+        console.log("fError:" + err);
+      }
+      else {
+          return res
+      }
+    });
+    let back = await backArticle.findByIdAndUpdate({
+      _id: id
+    }, {
+        $set: {
+          readnumber:number
+        }
+    },function(err, res){
+      if (err) {
+        console.log("fError:" + err);
+      }
+      else {
+          return res
+      }
+    });
+    ctx.body = {
+      error:0
+      // arr
+    };
+  } catch (e) {
+    ctx.body = {
+      error:-1,
+      e
+    };
+  }
+  
 })
 
 export default router

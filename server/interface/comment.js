@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 import axios from './utils/axios'
-import article from '../dbs/model/frontArticleSchema'
+import frontarticle from '../dbs/model/frontArticleSchema'
+import backArticle from '../dbs/model/backArticleSchema'
 import comment from '../dbs/model/commentSchema'
 import config from '../dbs/model/commentConfigSchema'
 
@@ -17,19 +18,36 @@ const getUserIp = (req) => {
         req.connection.socket.remoteAddress;
 }
 
-router.post('/insertComment', async ctx => {
+router.post('/insertComment', async (ctx) => {
     try {
-        let request = ctx.request.body;
-        let {_id: id, title,author} = await article.findOne({
-            "_id": request.id
+        let req = ctx.request.body;
+        let result = {};
+        // console.log(req.id)
+        let result1 = await frontarticle.findOne({
+            "_id": req.id
         })
-        // console.log(author)
-        // delete request.comment.pass
-        let json = Object.assign(request.comment, {
+        let result2 = await backArticle.findOne({
+            "_id": req.id
+        })
+        if (result1 == null) {
+            result = result2
+        } else {
+            result = result1;
+        }
+        
+        let json = Object.assign(req.comment, {
             ip: getUserIp(ctx.req)
         })
+        
+        
+
+        let id = result._id;
+        let title = result.title;
+        let author = result.author;
+        // console.log(id)
+        // console.log(title)
         // console.log(2111111111111)
-        let result = await comment.updateOne({
+        let result3 = await comment.updateOne({
             id: id,
             title: title,
             author:author
@@ -43,7 +61,7 @@ router.post('/insertComment', async ctx => {
         ctx.body = {
             status: '0',
             success: 1,
-            result
+            result3
         }
     } catch (error) {
         ctx.body = {
@@ -84,7 +102,7 @@ router.post('/commentsList', async ctx => {
         let pageSize = parseInt(req.pagesize);
         let author = req.author;
 
-        // console.log(author)
+        console.log(author)
         // console.log(pageSize)
         let result = await comment.find({author:author}, {
             __v: 0,

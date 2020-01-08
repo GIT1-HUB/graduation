@@ -191,10 +191,11 @@ export default {
         searchArticle() {
             this.frontloading = true;
             this.backloading = true;
-            if(this.searchArticle == ''){
+            if(this.searchStr == ''){
                 this.initFront(1)
                 this.initBack(1)
-            }
+                return
+            } else {
             let json = {author:this.$store.state.username,searcharticle:this.searchStr};
             this.$axios.get('/article/searchFrontArticleListByAuthor',{params:json}).then((res) => {
                 if(res.status == 200 && res.data.error == 0){
@@ -211,7 +212,7 @@ export default {
                     this.backCount = res.data.count
                     this.backloading = false;
                 }
-            })
+            })}
         }
     }
 

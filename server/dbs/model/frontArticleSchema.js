@@ -8,7 +8,7 @@ const articleSchema = new Schema({
 	des:String,
 	list:String,
 	author:String,
-	readnumber:String,
+	readnumber:{type:Number,default:0},
 	imgFileName: String,
 	comment: []
 })

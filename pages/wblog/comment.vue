@@ -215,7 +215,7 @@ export default {
       // console.log(this.searchArticle);
       if(this.searchArticle == ''){
         this.getCommentList();
-      }
+      } else {
       this.$axios.get('/comment/searchCommentList?searcharticle='+this.searchArticle).then((res) => {
         if(res.status == 200&& res.data.error == 0){
           console.log(11)
@@ -230,6 +230,7 @@ export default {
           }
         }
       })
+      }
       // console.log(result.data)
       // if(data.error == 0){
       //   this.commentTable = result.data.sclist;

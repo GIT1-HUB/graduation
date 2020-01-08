@@ -172,7 +172,7 @@ export default {
         },
         async commentsSubmit(json, formName) {
             let {data} = await this.$axios.post('/comment/insertComment',json)
-            // console.log(data)
+            console.log(data)
             if (Object.is(data.status, '0')) {
                 this.$refs[formName].resetFields()
                 this.$notify({
